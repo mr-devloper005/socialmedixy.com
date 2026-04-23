@@ -1,69 +1,252 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { Linkedin, Facebook, Twitter } from 'lucide-react'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
+import { ContentImage } from '@/components/shared/content-image'
+import { CopyLinkButton } from '@/components/press/copy-link-button'
 import { fetchTaskPostBySlug, fetchTaskPosts } from '@/lib/task-data'
-import type { TaskKey } from '@/lib/site-config'
+import { SITE_CONFIG, getTaskConfig, type TaskKey } from '@/lib/site-config'
 import { formatRichHtml, RichContent } from '@/components/shared/rich-content'
+import { SchemaJsonLd } from '@/components/seo/schema-jsonld'
+import type { SitePost } from '@/lib/site-connector'
 
 export const TASK_DETAIL_PAGE_OVERRIDE_ENABLED = true
 
-export async function TaskDetailPageOverride({ slug }: { task: TaskKey; slug: string }) {
-  const post = await fetchTaskPostBySlug('mediaDistribution', slug)
+function getContent(post: SitePost) {
+  return post.content && typeof post.content === 'object' ? (post.content as Record<string, unknown>) : {}
+}
+
+function getHeroImage(post: SitePost) {
+  const content = getContent(post)
+  const media = Array.isArray(post.media) ? post.media : []
+  const mediaUrl = media.find((item) => typeof item?.url === 'string' && item.url)?.url
+  const images = Array.isArray(content.images) ? content.images.filter((u): u is string => typeof u === 'string') : []
+  const logo = typeof content.logo === 'string' ? content.logo : null
+  return (
+    (typeof mediaUrl === 'string' && mediaUrl) ||
+    images[0] ||
+    logo ||
+    '/placeholder.svg?height=900&width=1600'
+  )
+}
+
+function subtitleFrom(post: SitePost) {
+  const content = getContent(post)
+  const ex = typeof content.excerpt === 'string' ? content.excerpt : ''
+  if (ex.trim()) return ex.trim()
+  const s = (post.summary || '').trim()
+  if (!s) return ''
+  return s.length > 220 ? s.slice(0, 217).trimEnd() + '…' : s
+}
+
+export async function TaskDetailPageOverride({ task, slug }: { task: TaskKey; slug: string }) {
+  const post = await fetchTaskPostBySlug(task, slug)
   if (!post) notFound()
-  const recent = (await fetchTaskPosts('mediaDistribution', 8, { fresh: true })).filter((item) => item.slug !== slug).slice(0, 5)
-  const content = (post.content || {}) as Record<string, unknown>
-  const html = formatRichHtml((content.body as string) || post.summary || '', 'Post body will appear here.')
+
+  const taskConfig = getTaskConfig(task)
+  const base = SITE_CONFIG.baseUrl.replace(/\/$/, '')
+  const route = taskConfig?.route || '/updates'
+  const canonicalUrl = `${base}${route}/${slug}`
+
+  const content = getContent(post)
+  const html = formatRichHtml(
+    (typeof content.body === 'string' && content.body) || post.summary || '',
+    'Full release text will appear here once published.',
+  )
+
+  const related = (await fetchTaskPosts(task, 10, { fresh: true }))
+    .filter((item) => item.slug !== slug)
+    .slice(0, 4)
+
+  const encodedUrl = encodeURIComponent(canonicalUrl)
+  const encodedTitle = encodeURIComponent(post.title)
+  const share = {
+    x: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
+    in: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    fb: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+  }
+
+  const hero = getHeroImage(post)
+  const sub = subtitleFrom(post)
+  const category =
+    typeof content.category === 'string' && content.category.trim()
+      ? content.category.trim()
+      : 'Press release'
+
+  const absoluteImage =
+    hero.startsWith('http://') || hero.startsWith('https://')
+      ? hero
+      : `${base}${hero.startsWith('/') ? hero : `/${hero}`}`
+
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'NewsArticle',
+    headline: post.title,
+    description: post.summary || sub,
+    image: [absoluteImage],
+    datePublished: post.publishedAt || undefined,
+    dateModified: post.publishedAt || undefined,
+    author: {
+      '@type': 'Person',
+      name: post.authorName || 'Editorial desk',
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': canonicalUrl,
+    },
+  }
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900">
+    <div className="min-h-screen bg-[#f7f1ea] text-[#290001]">
       <NavbarShell />
-      <section className="bg-neutral-900 py-14 text-white">
-        <div className="mx-auto max-w-6xl px-4 text-center sm:px-6">
-          <h1 className="mx-auto max-w-5xl text-4xl font-black uppercase leading-tight tracking-[0.02em] sm:text-5xl">{post.title}</h1>
-          <div className="mt-5 flex items-center justify-center gap-3 text-sm text-neutral-300">
-            <Link href="/">Home</Link>
-            <span>›</span>
-            <span className="truncate">{post.title}</span>
-          </div>
-        </div>
-      </section>
-      <main className="mx-auto grid max-w-6xl gap-12 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <article>
-          <div className="border border-[#f0dfd7] bg-[#faece7] px-6 py-5 text-sm text-neutral-600">
-            <span className="mr-3 inline-block bg-neutral-800 px-3 py-1 text-white">{new Date(post.publishedAt || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            <span>by {post.authorName || 'Editorial Desk'}</span>
-          </div>
-          <div className="prose prose-lg mt-10 max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-[0.01em]">
-            <RichContent html={html} />
-          </div>
-          <div className="mt-12 grid gap-0 border border-neutral-200 md:grid-cols-2">
-            {recent.slice(0,2).map((item, index) => (
-              <Link key={item.id} href={`/updates/${item.slug}`} className="border-neutral-200 p-6 first:border-b md:first:border-b-0 md:first:border-r">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">{index === 0 ? 'Previous Post' : 'Next Post'}</p>
-                <p className="mt-3 text-lg leading-8 text-neutral-700">{item.title}</p>
+      <SchemaJsonLd data={articleSchema} />
+
+      <article>
+        <header className="border-b border-[#e8d8ca] bg-[#fffdfa]">
+          <div className="relative mx-auto max-w-4xl px-4 pb-10 pt-12 text-center sm:px-6 sm:pb-14 sm:pt-16">
+            <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#87431d]">{category}</p>
+            <h1 className="mt-5 font-display text-3xl font-semibold leading-[1.12] tracking-[-0.03em] text-[#290001] sm:text-4xl lg:text-[2.65rem]">
+              {post.title}
+            </h1>
+            {sub ? (
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#5c4a42] sm:text-xl">{sub}</p>
+            ) : null}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#6b5348]">
+              <span className="rounded-full bg-[#f0e6dc] px-4 py-1.5 font-medium text-[#290001]">
+                {post.publishedAt
+                  ? new Date(post.publishedAt).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })
+                  : 'Date TBC'}
+              </span>
+              <span>By {post.authorName || 'Editorial desk'}</span>
+            </div>
+            <nav className="mt-8 flex flex-wrap justify-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#87431d]">
+              <Link href="/" className="hover:text-[#290001]">
+                Home
               </Link>
-            ))}
+              <span aria-hidden className="text-[#dbcbbd]">
+                /
+              </span>
+              <Link href={route} className="hover:text-[#290001]">
+                {taskConfig?.label || 'Archive'}
+              </Link>
+              <span aria-hidden className="text-[#dbcbbd]">
+                /
+              </span>
+              <span className="max-w-[min(100%,320px)] truncate text-[#5c4a42]">{post.title}</span>
+            </nav>
           </div>
-        </article>
-        <aside className="space-y-6">
-          <div className="border border-neutral-200 p-6">
-            <div className="flex items-center gap-0">
-              <input className="h-12 flex-1 border border-neutral-200 px-4 text-sm outline-none" placeholder="Type here to search" />
-              <button className="flex h-12 w-12 items-center justify-center bg-neutral-800 text-white">Q</button>
+
+          <div className="relative mx-auto max-w-5xl px-4 pb-10 sm:px-6">
+            <div className="relative aspect-[21/9] overflow-hidden rounded-[1.75rem] border border-[#e8d8ca] bg-[#f0e6dc] shadow-[0_24px_70px_rgba(41,0,1,0.08)] sm:aspect-[2.4/1]">
+              <ContentImage src={hero} alt="" fill className="object-cover" priority sizes="(max-width: 1024px) 100vw, 1024px" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#290001]/25 to-transparent" />
             </div>
           </div>
-          <div className="border border-neutral-200 p-6">
-            <div className="space-y-5">
-              {recent.map((item) => (
-                <Link key={item.id} href={`/updates/${item.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
-                  <p className="text-base leading-7 text-neutral-700">{item.title}</p>
-                </Link>
-              ))}
+        </header>
+
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-12 sm:px-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:gap-14 lg:py-16">
+          <div className="min-w-0">
+            <div className="article-content prose prose-lg max-w-none rounded-[1.5rem] border border-[#e8d8ca] bg-[#fffdfa] px-5 py-8 text-[#2a1810] shadow-sm sm:px-10 sm:py-11 prose-headings:font-display prose-a:text-[#87431d]">
+              <RichContent html={html} />
+            </div>
+
+            <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-[#e8d8ca] pt-8">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#87431d]">Share</span>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={share.x}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#e8d8ca] bg-white px-4 py-2 text-sm font-semibold text-[#290001] transition hover:border-[#c87941]"
+                >
+                  <Twitter className="h-4 w-4" />
+                  Post
+                </a>
+                <a
+                  href={share.in}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#e8d8ca] bg-white px-4 py-2 text-sm font-semibold text-[#290001] transition hover:border-[#c87941]"
+                >
+                  <Linkedin className="h-4 w-4" />
+                  LinkedIn
+                </a>
+                <a
+                  href={share.fb}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#e8d8ca] bg-white px-4 py-2 text-sm font-semibold text-[#290001] transition hover:border-[#c87941]"
+                >
+                  <Facebook className="h-4 w-4" />
+                  Facebook
+                </a>
+                <CopyLinkButton url={canonicalUrl} />
+              </div>
             </div>
           </div>
-        </aside>
-      </main>
+
+          <aside className="space-y-6 lg:pt-2">
+            <form action="/search" method="get" className="rounded-2xl border border-[#e8d8ca] bg-[#fffdfa] p-5 shadow-sm">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#87431d]">Search wire</p>
+              <div className="mt-3 flex gap-2">
+                <input type="hidden" name="task" value={task} />
+                <input
+                  name="q"
+                  placeholder="Search…"
+                  className="h-11 flex-1 rounded-xl border border-[#dbcbbd] bg-white px-3 text-sm text-[#290001] outline-none ring-[#c87941]/30 focus:ring-2"
+                />
+                <button type="submit" className="h-11 rounded-xl bg-[#87431d] px-4 text-sm font-semibold text-[#dbcbbd]">
+                  Go
+                </button>
+              </div>
+            </form>
+
+            {related.length ? (
+              <div className="rounded-2xl border border-[#e8d8ca] bg-[#fffdfa] p-5">
+                <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#87431d]">Related releases</p>
+                <ul className="mt-4 space-y-4">
+                  {related.map((item) => (
+                    <li key={item.id}>
+                      <Link href={`${route}/${item.slug}`} className="group flex gap-3">
+                        <div className="relative h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-[#f0e6dc]">
+                          <ContentImage
+                            src={getHeroImage(item)}
+                            alt=""
+                            fill
+                            className="object-cover transition group-hover:scale-105"
+                            sizes="96px"
+                          />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="line-clamp-2 text-sm font-semibold leading-snug text-[#290001] group-hover:text-[#87431d]">
+                            {item.title}
+                          </p>
+                          <p className="mt-1 text-xs text-[#6b5348]">
+                            {item.publishedAt
+                              ? new Date(item.publishedAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                                })
+                              : ''}
+                          </p>
+                        </div>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </aside>
+        </div>
+      </article>
+
       <Footer />
     </div>
   )
