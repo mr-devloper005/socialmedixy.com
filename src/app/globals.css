@@ -4,20 +4,27 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.985 0.006 84);
-  --foreground: oklch(0.23 0.03 20);
-  --card: oklch(0.992 0.004 84 / 0.96);
-  --card-foreground: oklch(0.23 0.03 20);
-  --popover: oklch(0.992 0.004 84 / 0.98);
-  --popover-foreground: oklch(0.23 0.03 20);
-  --primary: oklch(0.41 0.15 10);
-  --primary-foreground: oklch(0.99 0.005 84);
-  --secondary: oklch(0.95 0.02 85);
-  --secondary-foreground: oklch(0.3 0.04 20);
-  --muted: oklch(0.955 0.012 85);
-  --muted-foreground: oklch(0.47 0.04 28);
-  --accent: oklch(0.76 0.1 155);
-  --accent-foreground: oklch(0.18 0.03 20);
+  /* SocialMedixy brand — #290001 #87431D #C87941 #DBCBBD */
+  --smdx-ink: #290001;
+  --smdx-rust: #87431d;
+  --smdx-copper: #c87941;
+  --smdx-sand: #dbcbbd;
+  --smdx-paper: #f7f1ea;
+
+  --background: oklch(0.97 0.012 55);
+  --foreground: oklch(0.22 0.04 35);
+  --card: oklch(0.995 0.008 55 / 0.96);
+  --card-foreground: oklch(0.22 0.04 35);
+  --popover: oklch(0.995 0.008 55 / 0.98);
+  --popover-foreground: oklch(0.22 0.04 35);
+  --primary: oklch(0.45 0.12 45);
+  --primary-foreground: oklch(0.98 0.01 55);
+  --secondary: oklch(0.93 0.02 55);
+  --secondary-foreground: oklch(0.28 0.05 40);
+  --muted: oklch(0.94 0.015 55);
+  --muted-foreground: oklch(0.48 0.04 40);
+  --accent: oklch(0.72 0.12 55);
+  --accent-foreground: oklch(0.2 0.04 35);
   --destructive: oklch(0.6 0.2 25);
   --destructive-foreground: oklch(0.98 0.005 84);
   --border: oklch(0.88 0.02 70);
@@ -128,9 +135,9 @@
     @apply bg-background text-foreground;
     min-height: 100vh;
     background-image:
-      radial-gradient(circle at top left, rgba(110, 26, 55, 0.09), transparent 32%),
-      radial-gradient(circle at top right, rgba(114, 186, 169, 0.12), transparent 28%),
-      linear-gradient(180deg, rgba(255, 252, 246, 0.96) 0%, rgba(250, 244, 235, 0.98) 36%, rgba(247, 241, 230, 1) 100%);
+      radial-gradient(circle at 12% 0%, rgba(200, 121, 65, 0.14), transparent 38%),
+      radial-gradient(circle at 88% 8%, rgba(135, 67, 29, 0.1), transparent 32%),
+      linear-gradient(180deg, #f7f1ea 0%, #fdfaf6 48%, #f3ebe2 100%);
     background-attachment: fixed;
   }
 
@@ -140,9 +147,9 @@
     inset: 0;
     pointer-events: none;
     z-index: -1;
-    background-image: linear-gradient(rgba(255, 255, 255, 0.26) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px);
-    background-size: 120px 120px;
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 70%);
+    background-image: linear-gradient(rgba(41, 0, 1, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(41, 0, 1, 0.035) 1px, transparent 1px);
+    background-size: 96px 96px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.12), transparent 72%);
   }
 
   h1,
@@ -162,23 +169,23 @@
   }
 
   ::selection {
-    background: rgba(174, 36, 72, 0.18);
+    background: rgba(200, 121, 65, 0.28);
     color: inherit;
   }
 }
 
 @layer components {
   .paper-panel {
-    background: linear-gradient(180deg, rgba(255, 252, 247, 0.95), rgba(255, 248, 240, 0.88));
-    border: 1px solid rgba(110, 26, 55, 0.12);
-    box-shadow: 0 20px 60px rgba(80, 28, 36, 0.08);
+    background: linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(247, 241, 234, 0.92));
+    border: 1px solid rgba(135, 67, 29, 0.14);
+    box-shadow: 0 20px 60px rgba(41, 0, 1, 0.07);
   }
 
   .editorial-label {
     @apply inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em];
-    background: rgba(110, 26, 55, 0.08);
-    color: rgb(110, 26, 55);
-    border: 1px solid rgba(110, 26, 55, 0.12);
+    background: rgba(135, 67, 29, 0.1);
+    color: var(--smdx-rust);
+    border: 1px solid rgba(200, 121, 65, 0.25);
   }
 
   .editorial-divider {
@@ -192,7 +199,22 @@
     bottom: -1px;
     width: 132px;
     height: 2px;
-    background: linear-gradient(90deg, rgb(174, 36, 72), rgba(114, 186, 169, 0.55));
+    background: linear-gradient(90deg, var(--smdx-copper), rgba(219, 203, 189, 0.85));
+  }
+
+  .smdx-hover-rise {
+    @apply transition-[transform,box-shadow,border-color] duration-300 ease-out;
+  }
+
+  .smdx-hover-rise:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 40px rgba(41, 0, 1, 0.1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .smdx-hover-rise:hover {
+      transform: none;
+    }
   }
 }
 
@@ -206,12 +228,12 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(110, 26, 55, 0.25);
+  background: rgba(135, 67, 29, 0.35);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(110, 26, 55, 0.42);
+  background: rgba(135, 67, 29, 0.52);
 }
 
 .reading-progress {
@@ -219,7 +241,7 @@
   top: 0;
   left: 0;
   height: 2px;
-  background: linear-gradient(90deg, rgb(174, 36, 72), rgb(114, 186, 169));
+  background: linear-gradient(90deg, var(--smdx-rust), var(--smdx-copper));
   z-index: 100;
   transition: width 0.1s ease-out;
 }
@@ -229,7 +251,7 @@
   font-weight: 700;
   line-height: 1.25;
   margin: 2.2rem 0 1rem;
-  color: rgb(110, 26, 55);
+  color: var(--smdx-rust);
 }
 
 .article-content h3 {
@@ -244,7 +266,7 @@
 }
 
 .article-content a {
-  color: rgb(174, 36, 72);
+  color: var(--smdx-copper);
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
@@ -260,9 +282,9 @@ body[data-site-shell="directory"] {
 
 body[data-site-shell="editorial"] {
   background-image:
-    radial-gradient(circle at top left, rgba(245, 158, 11, 0.14), transparent 22%),
-    radial-gradient(circle at top right, rgba(120, 53, 15, 0.08), transparent 20%),
-    linear-gradient(180deg, rgba(255, 248, 239, 0.98) 0%, rgba(255, 252, 247, 1) 42%, rgba(255, 255, 255, 1) 100%);
+    radial-gradient(circle at top left, rgba(200, 121, 65, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(41, 0, 1, 0.06), transparent 22%),
+    linear-gradient(180deg, rgba(247, 241, 234, 0.98) 0%, rgba(253, 250, 246, 1) 46%, rgba(255, 255, 255, 1) 100%);
 }
 
 body[data-site-shell="studio"] {
@@ -346,4 +368,23 @@ body[data-motion-pack='editorial-soft'] main section {
 @keyframes factory-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+@keyframes smdx-ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-smdx-ticker {
+  animation: smdx-ticker 32s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-smdx-ticker {
+    animation: none;
+  }
 }

@@ -1,58 +1,65 @@
-import Link from 'next/link'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
 import { fetchTaskPosts } from '@/lib/task-data'
-import type { TaskKey } from '@/lib/site-config'
+import { getTaskConfig, type TaskKey } from '@/lib/site-config'
+import { normalizeCategory } from '@/lib/categories'
+import type { SitePost } from '@/lib/site-connector'
+import { PressReleaseDirectory, type PressReleaseCard } from '@/components/press/press-release-directory'
 
 export const TASK_LIST_PAGE_OVERRIDE_ENABLED = true
 
-function excerpt(text?: string | null) {
-  const value = (text || '').trim()
-  if (!value) return 'Read the full post for the complete update.'
-  return value.length > 220 ? value.slice(0, 217).trimEnd() + '...' : value
+function toCard(post: SitePost): PressReleaseCard {
+  const content = post.content && typeof post.content === 'object' ? (post.content as Record<string, unknown>) : {}
+  const catRaw = content.category
+  const category = typeof catRaw === 'string' && catRaw.trim() ? catRaw.trim() : 'Press release'
+  const media = Array.isArray(post.media) ? post.media : []
+  const mediaUrl = media.find((item) => typeof item?.url === 'string' && item.url)?.url
+  const images = Array.isArray(content.images) ? content.images.filter((u): u is string => typeof u === 'string') : []
+  const logo = typeof content.logo === 'string' ? content.logo : null
+  const image =
+    (typeof mediaUrl === 'string' && mediaUrl) ||
+    (images[0] && images[0]) ||
+    (logo && logo) ||
+    '/placeholder.svg?height=600&width=960'
+
+  return {
+    id: post.id,
+    slug: post.slug,
+    title: post.title,
+    summary: post.summary,
+    publishedAt: post.publishedAt || null,
+    authorName: post.authorName || null,
+    category,
+    image,
+  }
 }
 
-export async function TaskListPageOverride(_: { task: TaskKey; category?: string }) {
-  const posts = await fetchTaskPosts('mediaDistribution', 24, { fresh: true })
-  const recent = posts.slice(0, 5)
+export async function TaskListPageOverride({ task, category }: { task: TaskKey; category?: string }) {
+  const posts = await fetchTaskPosts(task, 48, { fresh: true })
+  const taskConfig = getTaskConfig(task)
+  const routePrefix = taskConfig?.route || '/updates'
+  const normalizedCategory = category ? normalizeCategory(category) : 'all'
+  const cards: PressReleaseCard[] = posts.map(toCard)
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900">
+    <div className="min-h-screen bg-[#f7f1ea] text-[#290001]">
       <NavbarShell />
-      <main className="mx-auto grid max-w-6xl gap-12 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <div className="space-y-14">
-          {posts.map((post) => (
-            <article key={post.id} className="border-b border-neutral-200 pb-12">
-              <p className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-neutral-500">{String((post.content as any)?.category || 'Update')}</p>
-              <h1 className="mx-auto mt-3 max-w-4xl text-center text-3xl font-black uppercase leading-tight tracking-[0.02em] sm:text-4xl">{post.title}</h1>
-              <div className="mt-4 flex items-center justify-center gap-3 text-sm text-neutral-500">
-                <span className="bg-neutral-800 px-3 py-1 text-white">{new Date(post.publishedAt || Date.now()).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                <span>by {post.authorName || 'Editorial Desk'}</span>
-              </div>
-              <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-neutral-700">{excerpt(post.summary)}</p>
-              <div className="mt-8 text-center">
-                <Link href={`/updates/${post.slug}`} className="inline-flex rounded-full bg-neutral-800 px-8 py-3 text-sm font-medium text-white hover:bg-black">Continue Reading</Link>
-              </div>
-            </article>
-          ))}
+      <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
+        <header className="relative overflow-hidden rounded-[2rem] border border-[#e8d8ca] bg-[#fffdfa] px-6 py-10 shadow-[0_20px_60px_rgba(41,0,1,0.06)] sm:px-10">
+          <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#c87941]/12 blur-2xl" />
+          <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#87431d]">{taskConfig?.label || 'Press'}</p>
+          <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-[-0.035em] text-[#290001] sm:text-5xl">
+            Press release archive
+          </h1>
+          <p className="mt-5 max-w-2xl text-sm leading-8 text-[#5c4a42]">
+            {taskConfig?.description ||
+              'Filter by topic and date, or search across headlines. Each card opens the full wire-formatted release.'}
+          </p>
+        </header>
+
+        <div className="mt-12">
+          <PressReleaseDirectory items={cards} routePrefix={routePrefix} initialCategory={normalizedCategory} />
         </div>
-        <aside className="space-y-6">
-          <div className="border border-neutral-200 p-6">
-            <div className="flex items-center gap-0">
-              <input className="h-12 flex-1 border border-neutral-200 px-4 text-sm outline-none" placeholder="Type here to search" />
-              <button className="flex h-12 w-12 items-center justify-center bg-neutral-800 text-white">Q</button>
-            </div>
-          </div>
-          <div className="border border-neutral-200 p-6">
-            <div className="space-y-5">
-              {recent.map((post) => (
-                <Link key={post.id} href={`/updates/${post.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
-                  <p className="text-base leading-7 text-neutral-700">{post.title}</p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </aside>
       </main>
       <Footer />
     </div>
