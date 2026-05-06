@@ -24,21 +24,21 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      'The archive and detail pages feel like a proper media wire. Our leadership team now shares release links with confidence.',
-    name: 'Rohit Verma',
-    role: 'Communications Lead, Axis Media Lab',
+      'The platform streamlined our content distribution with professional presentation and reliable delivery across all channels.',
+    name: 'Sarah Mitchell',
+    role: 'Marketing Director, TechVision Solutions',
   },
   {
     quote:
-      'The platform made our launch cycle smoother with a better reading experience and stronger visibility for each update.',
-    name: 'Kavya Nair',
-    role: 'Growth Director, BrightForge',
+      'Our media outreach became more effective with better organization and a polished interface that reflects our brand quality.',
+    name: 'James Chen',
+    role: 'Communications Manager, Innovate Labs',
   },
 ]
 
 const HOME_FAQ = [
   {
-    question: 'Can we publish frequent press releases every week?',
+    question: 'Can we publish frequent release media every week?',
     answer:
       'Yes. The homepage and archive are built for recurring announcements, so teams can keep publishing without redesigning layouts each cycle.',
   },
@@ -81,7 +81,7 @@ function getPostImage(post?: SitePost | null) {
 
 function categoryOf(post: SitePost) {
   const c = post.content && typeof post.content === 'object' ? (post.content as { category?: string }).category : ''
-  return typeof c === 'string' && c.trim() ? c.trim() : 'Press release'
+  return typeof c === 'string' && c.trim() ? c.trim() : 'Release media'
 }
 
 export async function HomePageOverride() {
@@ -142,12 +142,6 @@ export async function HomePageOverride() {
             >
               Browse press room
               <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              href="/pricing"
-              className="inline-flex items-center gap-2 rounded-full border border-[#dbcbbd]/45 bg-transparent px-7 py-3.5 text-sm font-semibold text-[#dbcbbd] transition hover:border-[#c87941] hover:text-white"
-            >
-              View distribution plans
             </Link>
           </div>
 
@@ -263,7 +257,7 @@ export async function HomePageOverride() {
           </section>
         ) : (
           <section className="rounded-[2rem] border border-dashed border-[#dbcbbd] bg-[#fffdfa] px-6 py-16 text-center">
-            <h2 className="font-display text-2xl font-semibold text-[#290001]">Press releases will appear here</h2>
+            <h2 className="font-display text-2xl font-semibold text-[#290001]">Release media will appear here</h2>
             <p className="mt-3 text-[#5c4a42]">Connect your feed — the homepage is ready to spotlight your next story.</p>
             <Link href="/contact" className="mt-8 inline-flex rounded-full bg-[#87431d] px-6 py-3 text-sm font-semibold text-[#dbcbbd]">
               Contact the desk

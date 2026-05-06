@@ -86,7 +86,7 @@ export function PressReleaseDirectory({
   if (!items.length) {
     return (
       <div className="rounded-2xl border border-dashed border-[#dbcbbd] bg-[#fffdfa]/80 px-6 py-16 text-center">
-        <p className="text-lg font-medium text-[#290001]">No press releases published yet.</p>
+        <p className="text-lg font-medium text-[#290001]">No release media published yet.</p>
         <p className="mt-2 text-sm text-[#6b5348]">When your feed goes live, stories will appear here with filters enabled.</p>
       </div>
     )
@@ -177,16 +177,7 @@ export function PressReleaseDirectory({
                 </span>
               </div>
               <div className="flex flex-1 flex-col p-5">
-                <time className="text-xs font-medium tabular-nums text-[#87431d]">
-                  {post.publishedAt
-                    ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                      })
-                    : '—'}
-                </time>
-                <h2 className="mt-2 font-display text-lg font-semibold leading-snug tracking-[-0.02em] text-[#290001] group-hover:text-[#87431d]">
+                <h2 className="font-display text-lg font-semibold leading-snug tracking-[-0.02em] text-[#290001] group-hover:text-[#87431d]">
                   {post.title}
                 </h2>
                 {post.summary ? (
