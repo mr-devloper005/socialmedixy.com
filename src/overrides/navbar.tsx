@@ -15,10 +15,9 @@ const utility = [
   { label: 'Cookies', href: '/cookies' },
 ]
 
-/** Primary + secondary emphasis: press archive + pricing; other routes stay in footer / direct URLs. */
+/** Primary + secondary emphasis: press archive; other routes stay in footer / direct URLs. */
 const primaryNav = [
   { label: 'Press room', href: '/updates' },
-  { label: 'Pricing', href: '/pricing' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ]
