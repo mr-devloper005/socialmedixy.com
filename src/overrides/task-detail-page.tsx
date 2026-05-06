@@ -72,7 +72,7 @@ export async function TaskDetailPageOverride({ task, slug }: { task: TaskKey; sl
   const category =
     typeof content.category === 'string' && content.category.trim()
       ? content.category.trim()
-      : 'Press release'
+      : 'Release media'
 
   const absoluteImage =
     hero.startsWith('http://') || hero.startsWith('https://')
@@ -112,19 +112,6 @@ export async function TaskDetailPageOverride({ task, slug }: { task: TaskKey; sl
             {sub ? (
               <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#5c4a42] sm:text-xl">{sub}</p>
             ) : null}
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm text-[#6b5348]">
-              <span className="rounded-full bg-[#f0e6dc] px-4 py-1.5 font-medium text-[#290001]">
-                {post.publishedAt
-                  ? new Date(post.publishedAt).toLocaleDateString('en-US', {
-                      weekday: 'short',
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })
-                  : 'Date TBC'}
-              </span>
-              <span>By {post.authorName || 'Editorial desk'}</span>
-            </div>
             <nav className="mt-8 flex flex-wrap justify-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#87431d]">
               <Link href="/" className="hover:text-[#290001]">
                 Home
@@ -226,15 +213,6 @@ export async function TaskDetailPageOverride({ task, slug }: { task: TaskKey; sl
                         <div className="min-w-0">
                           <p className="line-clamp-2 text-sm font-semibold leading-snug text-[#290001] group-hover:text-[#87431d]">
                             {item.title}
-                          </p>
-                          <p className="mt-1 text-xs text-[#6b5348]">
-                            {item.publishedAt
-                              ? new Date(item.publishedAt).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                })
-                              : ''}
                           </p>
                         </div>
                       </Link>

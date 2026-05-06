@@ -1,12 +1,10 @@
-import Link from 'next/link'
-import { Mail, MapPin, Phone } from 'lucide-react'
+import { MapPin } from 'lucide-react'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
 import { SITE_CONFIG } from '@/lib/site-config'
 
 export const CONTACT_PAGE_OVERRIDE_ENABLED = true
 
-const editorialEmail = process.env.NEXT_PUBLIC_EDITORIAL_EMAIL || 'editor@socialmedixy.com'
 const generalEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL || 'contact@socialmedixy.com'
 
 export function ContactPageOverride() {
@@ -24,26 +22,6 @@ export function ContactPageOverride() {
             </p>
 
             <div className="mt-10 space-y-5">
-              <div className="flex gap-4 rounded-2xl border border-[#e8d8ca] bg-[#fffdfa] p-5">
-                <Mail className="mt-1 h-5 w-5 shrink-0 text-[#c87941]" />
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#87431d]">Editorial & wire</p>
-                  <a href={`mailto:${editorialEmail}`} className="mt-1 block text-lg font-semibold text-[#290001] hover:text-[#87431d]">
-                    {editorialEmail}
-                  </a>
-                  <p className="mt-2 text-sm text-[#5c4a42]">Embargo timing, headline tweaks, and release formatting.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 rounded-2xl border border-[#e8d8ca] bg-[#fffdfa] p-5">
-                <Phone className="mt-1 h-5 w-5 shrink-0 text-[#c87941]" />
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#87431d]">Accounts & billing</p>
-                  <a href={`mailto:${generalEmail}`} className="mt-1 block text-lg font-semibold text-[#290001] hover:text-[#87431d]">
-                    {generalEmail}
-                  </a>
-                  <p className="mt-2 text-sm text-[#5c4a42]">Plans, invoices, and organization-level access.</p>
-                </div>
-              </div>
               <div className="flex gap-4 rounded-2xl border border-[#e8d8ca] bg-[#fffdfa] p-5">
                 <MapPin className="mt-1 h-5 w-5 shrink-0 text-[#c87941]" />
                 <div>
@@ -120,11 +98,7 @@ export function ContactPageOverride() {
               Prefer email?{' '}
               <a href={`mailto:${generalEmail}`} className="font-semibold text-[#87431d] hover:underline">
                 Write to us directly
-              </a>{' '}
-              or browse{' '}
-              <Link href="/pricing" className="font-semibold text-[#87431d] hover:underline">
-                pricing
-              </Link>
+              </a>
               .
             </p>
           </div>

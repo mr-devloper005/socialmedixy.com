@@ -9,7 +9,6 @@ const columns = [
     links: [
       { label: 'Press room', href: '/updates' },
       { label: 'Search', href: '/search' },
-      { label: 'Pricing', href: '/pricing' },
     ],
   },
   {
@@ -17,7 +16,6 @@ const columns = [
     links: [
       { label: 'About', href: '/about' },
       { label: 'Contact', href: '/contact' },
-      { label: 'Careers', href: '/careers' },
     ],
   },
   {

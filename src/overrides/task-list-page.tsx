@@ -11,7 +11,7 @@ export const TASK_LIST_PAGE_OVERRIDE_ENABLED = true
 function toCard(post: SitePost): PressReleaseCard {
   const content = post.content && typeof post.content === 'object' ? (post.content as Record<string, unknown>) : {}
   const catRaw = content.category
-  const category = typeof catRaw === 'string' && catRaw.trim() ? catRaw.trim() : 'Press release'
+  const category = typeof catRaw === 'string' && catRaw.trim() ? catRaw.trim() : 'Release media'
   const media = Array.isArray(post.media) ? post.media : []
   const mediaUrl = media.find((item) => typeof item?.url === 'string' && item.url)?.url
   const images = Array.isArray(content.images) ? content.images.filter((u): u is string => typeof u === 'string') : []
@@ -49,7 +49,7 @@ export async function TaskListPageOverride({ task, category }: { task: TaskKey; 
           <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#c87941]/12 blur-2xl" />
           <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#87431d]">{taskConfig?.label || 'Press'}</p>
           <h1 className="mt-4 max-w-3xl font-display text-4xl font-semibold tracking-[-0.035em] text-[#290001] sm:text-5xl">
-            Press release archive
+            Release media archive
           </h1>
           <p className="mt-5 max-w-2xl text-sm leading-8 text-[#5c4a42]">
             {taskConfig?.description ||

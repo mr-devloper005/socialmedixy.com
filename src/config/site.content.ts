@@ -29,13 +29,13 @@ export const siteContent = {
   },
   home: {
     metadata: {
-      title: 'Press releases & media distribution',
+      title: 'Release media & media distribution',
       description:
-        'Browse press releases, distribution plans, and announcement archives on socialMedixy.com — built for media teams and public communications.',
+        'Browse release media, distribution plans, and announcement archives on socialMedixy.com — built for media teams and public communications.',
       openGraphTitle: 'socialMedixy.com — press distribution',
       openGraphDescription:
-        'Wire-style press releases, archive filters, and readable article pages for modern media distribution.',
-      keywords: ['press release', 'media distribution', 'PR wire', 'announcements', 'socialMedixy'],
+        'Wire-style release media, archive filters, and readable article pages for modern media distribution.',
+      keywords: ['release media', 'media distribution', 'PR wire', 'announcements', 'socialMedixy'],
     },
     introBadge: 'Desk',
     introTitle: 'A press-forward experience, not a repurposed blog template.',
@@ -109,7 +109,7 @@ export const taskPageMetadata: Record<Exclude<TaskKey, 'comment' | 'org' | 'soci
   },
   mediaDistribution: {
     title: 'Press room',
-    description: 'Search and filter press releases by topic, date window, and keyword.',
+    description: 'Search and filter release media by topic, date window, and keyword.',
   },
 }
 
