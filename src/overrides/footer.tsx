@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { SITE_CONFIG } from '@/lib/site-config'
 import { fetchTaskPosts } from '@/lib/task-data'
 import { CATEGORY_OPTIONS, normalizeCategory } from '@/lib/categories'
@@ -59,7 +60,13 @@ export async function FooterOverride() {
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr_1fr]">
           <div>
-            <p className="font-display text-2xl font-semibold text-white">socialMedixy.com</p>
+            <Image
+              src="/logo.png"
+              alt="SocialMedixy logo"
+              width={160}
+              height={40}
+              className="h-10 w-auto object-contain brightness-0 invert"
+            />
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-[#dbcbbd]/85">{SITE_CONFIG.description}</p>
           </div>
           {columns.map((col) => (
