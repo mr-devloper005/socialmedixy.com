@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState } from 'react'
 import { Menu, Search, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { SITE_CONFIG } from '@/lib/site-config'
 import { cn } from '@/lib/utils'
 
 export const NAVBAR_OVERRIDE_ENABLED = true
@@ -42,11 +42,15 @@ export function NavbarOverride() {
       </div>
 
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-        <Link href="/" className="group flex min-w-0 items-baseline gap-2">
-          <span className="font-display text-xl font-semibold tracking-[-0.03em] text-[#290001] transition group-hover:text-[#87431d] sm:text-2xl">
-            socialMedixy
-          </span>
-          <span className="hidden text-sm font-medium text-[#87431d] sm:inline">.com</span>
+        <Link href="/" className="group flex min-w-0 items-center">
+          <Image
+            src="/logo.png"
+            alt="SocialMedixy logo"
+            width={160}
+            height={40}
+            className="h-10 w-auto object-contain"
+            priority
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
