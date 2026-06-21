@@ -66,6 +66,10 @@ export async function TaskDetailPageOverride({ slug }: { task: TaskKey; slug: st
   const pageUrl = `${SITE_CONFIG.baseUrl.replace(/\/$/, '')}${buildPostUrl('mediaDistribution', post.slug)}`
   const shareText = encodeURIComponent(post.title)
   const shareUrl = encodeURIComponent(pageUrl)
+  const dateSource = post.publishedAt || post.createdAt || post.updatedAt || ''
+  const date = dateSource
+    ? new Date(dateSource).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : ''
 
   return (
     <div className="min-h-screen bg-white text-foreground">
